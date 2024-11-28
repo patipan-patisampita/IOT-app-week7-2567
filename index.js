@@ -50,7 +50,7 @@ app.set('view engine', 'ejs')
 
 //Home page
 app.get('/', (req, res) => {
-    return res.render('index', { title: 'Home1 Page', active: 'home' })
+    return res.render('index', { title: 'Home Page', active: 'home' })
 })
 
 app.use('/', authRoute) //auth Router
