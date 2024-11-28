@@ -21,8 +21,28 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage })
 
 //route for posts page
-router.get('/posts', protectedRoute, (req, res) => {
-    return res.render('posts/index', { title: 'Post Page', active: 'posts' })
+router.get('/posts', protectedRoute, async (req, res) => {
+    try {
+        const userId = req.session.user._id
+        const user = await User.findById(userId).populate('posts')
+
+        if (!user) {
+            req.flash('error', 'User not found, try again!')
+            return req.redirect('/')
+        }
+
+        return res.render('posts/index', {
+            title: 'Post Page',
+            active: 'posts',
+            posts: user.posts
+        })
+        
+    } catch (error) {
+        console.error(error)
+        req.flash('error', 'An error occourred while fetching your posts, try again!')
+        return req.redirect('/posts')
+    }
+
 })
 
 //route for create new posts page
@@ -43,8 +63,7 @@ router.get('/post/:id', (req, res) => {
 //handle create new post request
 router.post('/create-post', protectedRoute, upload.single('image'), async function (req, res) {
     try {
-        const title = req.body.title
-        const content = req.body.content
+        const { title, content } = req.body
         const image = req.file.filename
         const slug = title.replace(/\s+/g, '_').toLowerCase()
 
@@ -62,7 +81,7 @@ router.post('/create-post', protectedRoute, upload.single('image'), async functi
 
     } catch (error) {
         console.error(error)
-        req.flash('error', 'Something went wrong.try again!')
+        req.flash('error', 'Something went wrong, try again!')
         return req.redirect('/create-post')
     }
 })

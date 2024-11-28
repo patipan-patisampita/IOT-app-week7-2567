@@ -6,6 +6,7 @@ import postRoute from './routes/postRoute.js'
 import cookieParser from 'cookie-parser'
 import session from 'express-session'
 import flash from 'connect-flash'
+import path from 'path'
 
 const app = express() // create app
 const port = process.env.PORT || 8080
@@ -16,6 +17,9 @@ connectMongoDB()
 //Middleware
 app.use(express.json()) //แปลงข้อมูลที่มีรูปแบบ JSON String ให้อยู่ในรูป JSON Objext    
 app.use(express.urlencoded({ extended: false })) // แปลงข้อมูลจาก form ในรูปแบบ url encode เป็น Object
+
+//make uploads directory as static files
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')))
 
 //Cookie middleware
 app.use(cookieParser(process.env.COOKIE_SECRET))
